@@ -23,6 +23,7 @@ dependencies = [
     "pydantic>=2.10.0",
     "python-dotenv>=1.0.0",
     "tqdm>=4.66.0",
+    "torch>=2.5.0",
     "transformers>=4.47.0",
     # unsloth must be installed separately — see README
     # pip install "unsloth[cu124-torch250]" or the matching variant for your CUDA/torch version
@@ -30,3 +31,11 @@ dependencies = [
 
 [project.scripts]
 evaluate = "gemma4_finetuned_packing_evaluation.main:main"
+
+[tool.uv.sources]
+torch = { index = "pytorch-cuda" }
+
+[[tool.uv.indexes]]
+name = "pytorch-cuda"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
