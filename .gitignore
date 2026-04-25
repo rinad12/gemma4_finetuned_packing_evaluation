@@ -32,6 +32,9 @@ checkpoints/
 outputs/
 runs/
 
+# Evaluation results
+results/
+
 # Logs
 *.log
 logs/
