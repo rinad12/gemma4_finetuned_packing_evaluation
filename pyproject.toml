@@ -25,8 +25,7 @@ dependencies = [
     "tqdm>=4.66.0",
     "torch>=2.5.0",
     "transformers>=4.47.0",
-    # unsloth must be installed separately — see README
-    # pip install "unsloth[cu124-torch250]" or the matching variant for your CUDA/torch version
+    "unsloth[cu128-torch250]>=2024.11.4",
 ]
 
 [project.scripts]
