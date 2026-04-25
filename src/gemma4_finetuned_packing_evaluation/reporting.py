@@ -111,6 +111,63 @@ def print_summary(combined: pd.DataFrame) -> None:
     print(summary.to_string())
 
 
+def save_metrics_md(
+    combined: pd.DataFrame,
+    metrics_by_label: dict[str, dict],
+    num_samples: int,
+    path: str = "METRICS.md",
+) -> None:
+    from datetime import datetime
+
+    lines = [
+        "# Evaluation Metrics — SmartPack AI",
+        "",
+        f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}  ",
+        f"**Samples:** {num_samples} random test examples  ",
+        f"**Models:** {', '.join(metrics_by_label.keys())}",
+        "",
+        "## Summary",
+        "",
+    ]
+
+    summary = (
+        combined[["model", "json_valid", "tps", "expert_recall",
+                   "bert_score_f1", "accuracy", "expertise", "logic"]]
+        .groupby("model")
+        .agg(
+            json_validity=("json_valid", "mean"),
+            avg_tps=("tps", "mean"),
+            avg_expert_recall=("expert_recall", "mean"),
+            avg_bert_f1=("bert_score_f1", "mean"),
+            avg_accuracy=("accuracy", "mean"),
+            avg_expertise=("expertise", "mean"),
+            avg_logic=("logic", "mean"),
+        )
+        .round(4)
+    )
+    summary["json_validity"] = (summary["json_validity"] * 100).map("{:.1f}%".format)
+
+    # Markdown table
+    cols = list(summary.columns)
+    lines.append("| Model | " + " | ".join(cols) + " |")
+    lines.append("|-------|" + "|".join(["-------"] * len(cols)) + "|")
+    for model_name, row in summary.iterrows():
+        lines.append(f"| {model_name} | " + " | ".join(str(v) for v in row) + " |")
+
+    lines += ["", "## Normalised Metrics (0–1)", ""]
+    metric_names = list(next(iter(metrics_by_label.values())).keys())
+    lines.append("| Metric | " + " | ".join(metrics_by_label.keys()) + " |")
+    lines.append("|--------|" + "|".join(["--------"] * len(metrics_by_label)) + "|")
+    for metric in metric_names:
+        vals = [str(round(metrics_by_label[label][metric], 4)) for label in metrics_by_label]
+        lines.append(f"| {metric} | " + " | ".join(vals) + " |")
+
+    lines += [""]
+
+    Path(path).write_text("\n".join(lines), encoding="utf-8")
+    print(f"Metrics saved to {path}")
+
+
 def save_results(combined: pd.DataFrame, output_dir: str = "results") -> None:
     out = Path(output_dir)
     out.mkdir(exist_ok=True)

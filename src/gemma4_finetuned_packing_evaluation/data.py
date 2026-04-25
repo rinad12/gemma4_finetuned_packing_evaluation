@@ -34,9 +34,9 @@ def row_to_output(row: dict) -> str:
     return f"Reasoning: {row['reasoning']}\n\nPacking List: {json.dumps(flat_list, ensure_ascii=False)}"
 
 
-def load_datasets(hf_token: str):
-    dataset_test  = load_dataset(DATASET_ID, split="test",  token=hf_token)
-    dataset_train = load_dataset(DATASET_ID, split="train", token=hf_token)
+def load_datasets():
+    dataset_test  = load_dataset(DATASET_ID, split="test")
+    dataset_train = load_dataset(DATASET_ID, split="train")
     return dataset_train, dataset_test
 
 

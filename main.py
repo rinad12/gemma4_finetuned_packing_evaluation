@@ -25,13 +25,14 @@ from gemma4_finetuned_packing_evaluation.config import (
 from gemma4_finetuned_packing_evaluation.data import load_datasets, prepare_eval_data
 from gemma4_finetuned_packing_evaluation.evaluator import SmartPackEvaluator
 from gemma4_finetuned_packing_evaluation.reporting import (
+    _normalize_metrics,
     plot_radar_comparison,
     print_judge_comments,
     print_metrics_comparison,
     print_results_table,
     print_summary,
+    save_metrics_md,
     save_results,
-    _normalize_metrics,
 )
 
 import pandas as pd
@@ -47,8 +48,7 @@ def main():
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
-    hf_token     = os.environ["HF_TOKEN"]
-    gemini_key   = os.environ.get("GEMINI_API_KEY", "")
+    gemini_key = os.environ.get("GEMINI_API_KEY", "")
 
     # ── 1. Load fine-tuned model (base weights + LoRA adapter) ──────────────
     print(f"\nLoading fine-tuned model from {ADAPTER_ID}...")
@@ -56,6 +56,7 @@ def main():
         model_name=ADAPTER_ID,
         max_seq_length=MAX_SEQ_LENGTH,
         load_in_4bit=True,
+        token=os.environ.get("HF_TOKEN"),  # optional — only needed if model is private
     )
 
     # Remove multimodal towers to free VRAM
@@ -73,7 +74,7 @@ def main():
 
     # ── 2. Load dataset ──────────────────────────────────────────────────────
     print("Loading dataset...")
-    dataset_train, dataset_test = load_datasets(hf_token)
+    dataset_train, dataset_test = load_datasets()
     prompts, reference_texts, few_shot_pairs = prepare_eval_data(
         dataset_train, dataset_test,
         num_samples=args.num_samples,
@@ -133,6 +134,11 @@ def main():
     fig.write_html(f"{args.output_dir}/radar.html")
 
     save_results(combined, args.output_dir)
+    save_metrics_md(
+        combined,
+        {"Fine-tuned": metrics_ft, "Base": metrics_base},
+        num_samples=args.num_samples,
+    )
     print("\nDone.")
 
 
