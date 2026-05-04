@@ -17,9 +17,9 @@ env/
 # uv
 .python-version
 
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb
+# # Jupyter
+# .ipynb_checkpoints/
+# *.ipynb
 
 # ML / HuggingFace model weights
 *.bin

@@ -26,6 +26,7 @@ dependencies = [
     "torch>=2.5.0",
     "transformers>=4.47.0",
     "unsloth[cu128-torch250]>=2024.11.4",
+    "llama-cpp-python>=0.3.22",
 ]
 
 [project.scripts]
@@ -34,7 +35,7 @@ evaluate = "gemma4_finetuned_packing_evaluation.main:main"
 [tool.uv.sources]
 torch = { index = "pytorch-cuda" }
 
-[[tool.uv.indexes]]
+[[tool.uv.index]]
 name = "pytorch-cuda"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
